@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KD Cookies - Fresh Homemade Cookies</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Playfair Display for headings and Inter for body text -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              cream: '#FDFBF7',
+              caramel: '#D8974B',
+              border: '#CB8639',
+              dark: '#582B0E',
+              darkHover: '#442009',
+              lightTan: '#F5E6D3'
+            }
+          },
+          fontFamily: {
+            serif: ['"Playfair Display"', 'Georgia', 'serif'],
+            sans: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      background-color: #FDFBF7;
+      font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+      color: #382414;
+    }
+    .cookie-card-border {
+      border: 3.5px solid #D8974B;
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background-color: #D8974B;
+      border-radius: 9999px;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col selection:bg-amber-200">
+
+  <!-- ========================================== -->
+  <!-- HEADER & NAVIGATION                        -->
+  <!-- ========================================== -->
+  <header class="sticky top-0 z-40 bg-[#FDFBF7]/95 backdrop-blur-md border-b border-amber-200/60 shadow-sm">
+    <div class="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
+      
+      <!-- Logo & Brand Name -->
+      <a href="#" class="flex items-center gap-3 group">
+        <!-- Brand Logo Image (Change the src attribute or edit STORE_CONFIG.logoUrl in script) -->
+        <img 
+          id="brand-logo"
+          src="logo.png" 
+          alt="KD Cookies Logo"
+          class="w-12 h-12 object-contain rounded-full bg-amber-50 p-1 border border-amber-300 shadow-sm group-hover:scale-105 transition-transform duration-200"
+          onerror="this.onerror=null; this.src='https://placehold.co/120x120/F5E6D3/582B0E?text=KD+Cookies';"
+        />
+        <div>
+          <h1 class="font-serif text-2xl font-bold tracking-tight text-[#582B0E] leading-none">KD COOKIES</h1>
+          <p class="text-xs text-amber-800/80 font-medium tracking-wider uppercase mt-0.5">Freshly Baked Goodness</p>
+        </div>
+      </a>
+
+      <!-- Cart Button with Live Badge -->
+      <button 
+        id="cart-toggle-btn"
+        onclick="toggleCart(true)"
+        class="relative flex items-center gap-2 bg-[#582B0E] hover:bg-[#442009] text-white px-4 py-2.5 rounded-full font-semibold shadow-md active:scale-95 transition"
+        aria-label="View shopping bag"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+        </svg>
+        <span class="hidden sm:inline text-sm">Cart</span>
+        <span 
+          id="cart-badge" 
+          class="bg-[#D8974B] text-[#582B0E] font-bold text-xs px-2 py-0.5 rounded-full min-w-[20px] text-center"
+        >0</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- ========================================== -->
+  <!-- MAIN CONTENT CONTAINER                    -->
+  <!-- ========================================== -->
+  <main class="max-w-4xl mx-auto px-4 py-8 flex-1 w-full">
+
+    <!-- Page Title / Banner -->
+    <div class="text-center mb-8">
+      <h2 class="font-serif text-4xl sm:text-5xl font-bold text-[#582B0E] tracking-tight mb-2">Our Menu</h2>
+      <p class="text-[#8A4815] text-sm sm:text-base font-medium max-w-md mx-auto">
+        Baked fresh daily using rich buttery dough and premium ingredients. Pick your favorites below!
+      </p>
+    </div>
+
+    <!-- Product Grid -->
+    <div id="product-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8 mb-10">
+      <!-- Products are automatically rendered here by JavaScript -->
+    </div>
+
+    <!-- ========================================== -->
+    <!-- OFFERS SECTION (MATCHES MENU BOTTOM)      -->
+    <!-- ========================================== -->
+    <section class="bg-[#D8974B] p-1.5 sm:p-2 rounded-3xl shadow-lg text-white">
+      <div class="text-center py-2.5">
+        <h3 class="font-serif text-2xl sm:text-3xl font-bold tracking-wider uppercase text-white drop-shadow-sm">Offers</h3>
+      </div>
+      
+      <div class="bg-[#FDFBF7] text-[#582B0E] rounded-2xl p-5 sm:p-6 text-center space-y-3 shadow-inner">
+        <div class="flex items-center justify-center gap-2">
+          <span class="text-xl">✨</span>
+          <p class="text-base sm:text-lg font-bold">
+            Buy 3 Classic or M&amp;M Cookies for <span class="text-[#D8974B] underline decoration-2">75 EGP</span>
+            <span class="text-xs bg-amber-100 text-amber-900 font-semibold px-2 py-0.5 rounded ml-1">Save 15 EGP</span>
+          </p>
+        </div>
+
+        <div class="w-24 h-[1px] bg-amber-200 mx-auto"></div>
+
+        <div class="flex items-center justify-center gap-2">
+          <span class="text-xl">🍪</span>
+          <p class="text-base sm:text-lg font-bold">
+            Buy 5 cookies or more and get a <span class="text-[#D8974B]">FREE Classic Cookie</span>!
+          </p>
+        </div>
+        
+        <p class="text-xs text-amber-800/70 pt-1">
+          *Discounts and free items are automatically calculated in your cart!
+        </p>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ========================================== -->
+  <!-- FOOTER                                     -->
+  <!-- ========================================== -->
+  <footer class="mt-auto border-t border-amber-200 py-6 text-center text-sm text-[#8A4815] bg-[#F8F2E9]">
+    <p class="font-semibold">KD Cookies &copy; <span id="year"></span> &bull; Baked with &hearts;</p>
+    <p class="text-xs text-[#8A4815]/80 mt-1">Order online for fast pickup &amp; delivery.</p>
+  </footer>
+
+  <!-- ========================================== -->
+  <!-- CART SLIDE-OVER DRAWER                     -->
+  <!-- ========================================== -->
+  <div 
+    id="cart-drawer-backdrop" 
+    onclick="toggleCart(false)" 
+    class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 opacity-0 pointer-events-none transition-opacity duration-300"
+  ></div>
+
+  <aside 
+    id="cart-drawer" 
+    class="fixed top-0 right-0 h-full w-full sm:w-[420px] bg-[#FDFBF7] z-50 shadow-2xl translate-x-full transition-transform duration-300 flex flex-col"
+    aria-label="Your Bag"
+  >
+    <!-- Drawer Header -->
+    <div class="p-5 border-b border-amber-200 flex items-center justify-between bg-[#F7EFE4]">
+      <div class="flex items-center gap-2">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-[#582B0E]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+        </svg>
+        <h3 class="font-serif text-xl font-bold text-[#582B0E]">Your Cookie Cart</h3>
+      </div>
+      <button 
+        onclick="toggleCart(false)" 
+        class="text-stone-500 hover:text-black p-1 rounded-full hover:bg-black/5"
+        aria-label="Close cart"
+      >
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+
+    <!-- Drawer Items List -->
+    <div id="cart-items-container" class="flex-1 overflow-y-auto p-5 space-y-4 custom-scrollbar">
+      <!-- Injected by JS -->
+    </div>
+
+    <!-- Drawer Footer / Summary -->
+    <div id="cart-footer" class="p-5 border-t border-amber-200 bg-[#F7EFE4]/60 space-y-3">
+      <!-- Offer Highlights in Cart -->
+      <div id="offers-applied-box" class="space-y-1.5">
+        <!-- Rendered if offers apply -->
+      </div>
+
+      <!-- Price totals -->
+      <div class="space-y-1 text-sm text-[#582B0E] pt-2 border-t border-amber-200/70">
+        <div class="flex justify-between">
+          <span class="text-stone-600">Subtotal:</span>
+          <span id="cart-subtotal" class="font-semibold">0 EGP</span>
+        </div>
+        <div id="discount-row" class="flex justify-between text-emerald-700 hidden">
+          <span>Special Offers Discount:</span>
+          <span id="cart-discount" class="font-semibold">-0 EGP</span>
+        </div>
+        <div class="flex justify-between text-base font-bold pt-1 border-t border-amber-200">
+          <span>Total:</span>
+          <span id="cart-total" class="text-lg text-[#582B0E]">0 EGP</span>
+        </div>
+      </div>
+
+      <button 
+        id="checkout-btn" 
+        onclick="openCheckoutModal()" 
+        class="w-full bg-[#582B0E] hover:bg-[#442009] text-white py-3.5 rounded-xl font-bold text-base shadow-md active:scale-[0.99] transition flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        <span>Proceed to Checkout</span>
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+        </svg>
+      </button>
+    </div>
+  </aside>
+
+  <!-- ========================================== -->
+  <!-- SIMPLE CHECKOUT MODAL                      -->
+  <!-- ========================================== -->
+  <div 
+    id="checkout-modal" 
+    class="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm hidden flex items-center justify-center p-4 overflow-y-auto"
+  >
+    <div class="bg-[#FDFBF7] rounded-3xl max-w-lg w-full p-6 sm:p-7 shadow-2xl border-2 border-[#D8974B] relative my-auto">
+      <button 
+        onclick="closeCheckoutModal()" 
+        class="absolute top-4 right-4 text-stone-500 hover:text-black p-1 rounded-full"
+      >
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+
+      <h3 class="font-serif text-2xl font-bold text-[#582B0E] mb-1">Complete Your Order</h3>
+      <p class="text-xs text-[#8A4815] mb-5">Please fill in your delivery details to place the order.</p>
+
+      <form id="order-form" onsubmit="handlePlaceOrder(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-bold text-[#582B0E] uppercase mb-1">Your Name *</label>
+          <input 
+            type="text" 
+            id="cust-name" 
+            required 
+            placeholder="e.g. Sarah Ahmed" 
+            class="w-full px-3.5 py-2.5 rounded-xl border border-amber-300 focus:outline-none focus:ring-2 focus:ring-[#D8974B] bg-white text-sm"
+          >
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-[#582B0E] uppercase mb-1">Phone Number *</label>
+          <input 
+            type="tel" 
+            id="cust-phone" 
+            required 
+            placeholder="e.g. 01012345678" 
+            class="w-full px-3.5 py-2.5 rounded-xl border border-amber-300 focus:outline-none focus:ring-2 focus:ring-[#D8974B] bg-white text-sm"
+          >
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-[#582B0E] uppercase mb-1">Delivery Address *</label>
+          <textarea 
+            id="cust-address" 
+            rows="2" 
+            required 
+            placeholder="Street address, building, apartment/floor..."
+            class="w-full px-3.5 py-2 rounded-xl border border-amber-300 focus:outline-none focus:ring-2 focus:ring-[#D8974B] bg-white text-sm"
+          ></textarea>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-[#582B0E] uppercase mb-1">Order Notes (Optional)</label>
+          <input 
+            type="text" 
+            id="cust-notes" 
+            placeholder="Special requests or timing instructions" 
+            class="w-full px-3.5 py-2 rounded-xl border border-amber-300 focus:outline-none focus:ring-2 focus:ring-[#D8974B] bg-white text-sm"
+          >
+        </div>
+
+        <div class="bg-[#F7EFE4] p-3 rounded-xl border border-amber-200 text-xs text-[#582B0E] flex justify-between items-center font-medium">
+          <span>Total to Pay on Delivery:</span>
+          <span id="modal-order-total" class="text-base font-bold text-[#582B0E]">0 EGP</span>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+          <!-- WhatsApp order option (very popular for local bakery orders) -->
+          <button 
+            type="button" 
+            onclick="submitOrderViaWhatsApp()" 
+            class="w-full bg-[#25D366] hover:bg-[#1EBE5D] text-white py-3 rounded-xl font-bold text-sm shadow flex items-center justify-center gap-2 active:scale-95 transition"
+          >
+            <!-- WhatsApp SVG -->
+            <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
+              <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981z"/>
+            </svg>
+            <span>Order via WhatsApp</span>
+          </button>
+
+          <!-- Direct website submit option -->
+          <button 
+            type="submit" 
+            class="w-full bg-[#582B0E] hover:bg-[#442009] text-white py-3 rounded-xl font-bold text-sm shadow active:scale-95 transition"
+          >
+            Confirm Order
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- ORDER SUCCESS MODAL                        -->
+  <!-- ========================================== -->
+  <div 
+    id="success-modal" 
+    class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden flex items-center justify-center p-4"
+  >
+    <div class="bg-[#FDFBF7] rounded-3xl max-w-md w-full p-8 text-center border-2 border-[#D8974B] shadow-2xl space-y-4 animate-scaleUp">
+      <div class="w-16 h-16 bg-amber-100 text-[#D8974B] rounded-full mx-auto flex items-center justify-center text-3xl shadow">
+        🍪
+      </div>
+      <h3 class="font-serif text-3xl font-bold text-[#582B0E]">Thank You!</h3>
+      <p class="text-sm text-[#8A4815] leading-relaxed">
+        Your order has been placed successfully! We'll start baking your fresh cookies right away.
+      </p>
+      <div id="order-summary-box" class="bg-[#F7EFE4] p-4 rounded-2xl text-left text-xs text-[#582B0E] space-y-1">
+        <!-- Rendered after order -->
+      </div>
+      <button 
+        onclick="closeSuccessModal()" 
+        class="w-full bg-[#582B0E] hover:bg-[#442009] text-white py-3 rounded-xl font-bold text-sm transition"
+      >
+        Done &amp; Order More
+      </button>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div 
+    id="toast" 
+    class="fixed bottom-6 left-1/2 -translate-x-1/2 bg-[#582B0E] text-white text-sm font-semibold px-5 py-3 rounded-full shadow-xl opacity-0 pointer-events-none transition-all duration-300 z-50 flex items-center gap-2"
+  >
+    <span>🍪 Added to cart!</span>
+  </div>
+
+  <!-- ================================================================= -->
+  <!-- JAVASCRIPT LOGIC & EASY EDIT CONFIGURATION                        -->
+  <!-- ================================================================= -->
+  <script>
+    /* ================================================================
+       EASY EDIT CONFIGURATION SECTION
+       👉 Edit your cookie items, prices, photos, and store phone here!
+       ================================================================ */
+    const STORE_CONFIG = {
+      storeName: "KD Cookies",
+      currency: "EGP",
+      // Set your WhatsApp phone number with country code (e.g., 20 for Egypt + number)
+      whatsappNumber: "201000000000",
+      // 👉 Set your logo image URL or local path here (e.g. 'images/logo.png')
+      logoUrl: "logo.png"
+    };
+
+    // Products matching your menu
+    // NOTE: You can replace the 'image' URLs below with your own local file path 
+    // e.g. 'images/classic.jpg' or any image web link!
+    const PRODUCTS = [
+      {
+        id: "classic",
+        name: "Classic Cookies",
+        price: 30,
+        description: "Soft & chewy golden cookie loaded with semi-sweet chocolate chunks.",
+        image: "https://images.unsplash.com/photo-1499636136210-6f4ee915583e?auto=format&fit=crop&w=700&q=80",
+        isEligibleForBundleOffer: true // eligible for the 3 for 75 EGP deal
+      },
+      {
+        id: "m_and_m",
+        name: "M&M Cookies",
+        price: 30,
+        description: "Baked with vibrant crunchy M&M chocolate candies on a buttery cookie base.",
+        image: "https://images.unsplash.com/photo-1558961363-fa8fdf82db35?auto=format&fit=crop&w=700&q=80",
+        isEligibleForBundleOffer: true // eligible for the 3 for 75 EGP deal
+      },
+      {
+        id: "peanut_butter",
+        name: "Peanut Butter Cookie",
+        price: 30,
+        description: "Rich, nutty, and tender peanut butter dough infused with decadent chocolate drops.",
+        image: "https://images.unsplash.com/photo-1590080875515-8a3a8dc5735e?auto=format&fit=crop&w=700&q=80",
+        isEligibleForBundleOffer: false
+      },
+      {
+        id: "double_chunk",
+        name: "Double Chunk Chocolate Cookie",
+        price: 35,
+        description: "Intense double chocolate dough packed with melted chocolate chunks for serious chocoholics.",
+        image: "https://images.unsplash.com/photo-1606313564200-e75d5e30476c?auto=format&fit=crop&w=700&q=80",
+        isEligibleForBundleOffer: false
+      }
+    ];
+
+    /* ================================================================
+       APPLICATION STATE
+       ================================================================ */
+    let cart = {}; // maps productId -> quantity
+
+    // Initial load
+    document.addEventListener("DOMContentLoaded", () => {
+      document.getElementById("year").textContent = new Date().getFullYear();
+      
+      // Update logo image from config
+      const logoEl = document.getElementById("brand-logo");
+      if (logoEl && STORE_CONFIG.logoUrl) {
+        logoEl.src = STORE_CONFIG.logoUrl;
+      }
+
+      renderProducts();
+      updateCartUI();
+    });
+
+    /* ================================================================
+       RENDER PRODUCTS
+       ================================================================ */
+    function renderProducts() {
+      const container = document.getElementById("product-grid");
+      container.innerHTML = "";
+
+      PRODUCTS.forEach(product => {
+        const card = document.createElement("div");
+        card.className = "cookie-card-border rounded-[32px] overflow-hidden bg-[#FDFBF7] shadow-md hover:shadow-xl transition-all duration-300 flex flex-col";
+        
+        card.innerHTML = `
+          <!-- Image Wrapper with menu styled border inside -->
+          <div class="p-3.5 pb-0 bg-transparent">
+            <div class="w-full h-64 sm:h-72 overflow-hidden rounded-[24px] bg-amber-50 relative group">
+              <img 
+                src="${product.image}" 
+                alt="${product.name}" 
+                loading="lazy"
+                onerror="this.onerror=null; this.src='https://placehold.co/600x600/F5E6D3/582B0E?text=${encodeURIComponent(product.name)}';"
+                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+              />
+            </div>
+          </div>
+
+          <!-- Bottom Card Container styled with the menu's warm caramel bar -->
+          <div class="p-4 sm:p-5 flex-1 flex flex-col justify-between bg-[#D8974B] text-center mt-3 text-white">
+            <div>
+              <h3 class="font-bold text-xl sm:text-2xl tracking-wide drop-shadow-sm">${product.name}</h3>
+              <p class="text-2xl sm:text-3xl font-extrabold mt-1 tracking-tight text-white drop-shadow">
+                ${product.price} <span class="text-lg font-bold">${STORE_CONFIG.currency}</span>
+              </p>
+              <p class="text-xs text-amber-100/90 mt-1 max-w-xs mx-auto line-clamp-2">${product.description}</p>
+            </div>
+
+            <div class="mt-4 pt-3 border-t border-amber-300/40 flex items-center justify-center gap-3">
+              <button 
+                onclick="addToCart('${product.id}')"
+                class="w-full bg-[#582B0E] hover:bg-[#442009] text-white py-2.5 px-4 rounded-xl font-bold text-sm tracking-wide shadow-md active:scale-95 transition flex items-center justify-center gap-2"
+              >
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                </svg>
+                <span>Add to Cart</span>
+              </button>
+            </div>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    /* ================================================================
+       CART ACTIONS & SPECIAL OFFERS LOGIC
+       ================================================================ */
+    function addToCart(productId) {
+      if (!cart[productId]) {
+        cart[productId] = 0;
+      }
+      cart[productId] += 1;
+      updateCartUI();
+      showToast("🍪 Added to cart!");
+    }
+
+    function changeQuantity(productId, delta) {
+      if (cart[productId]) {
+        cart[productId] += delta;
+        if (cart[productId] <= 0) {
+          delete cart[productId];
+        }
+      }
+      updateCartUI();
+    }
+
+    function removeItem(productId) {
+      delete cart[productId];
+      updateCartUI();
+    }
+
+    // Calculates raw subtotal, bundles (Offer 1), and free items (Offer 2)
+    function calculateCartTotals() {
+      let subtotal = 0;
+      let totalCookiesCount = 0;
+      let eligibleBundleCount = 0;
+
+      // Scan through all items in cart
+      Object.keys(cart).forEach(id => {
+        const item = PRODUCTS.find(p => p.id === id);
+        const qty = cart[id];
+        if (item && qty > 0) {
+          subtotal += item.price * qty;
+          totalCookiesCount += qty;
+
+          // Check if item qualifies for 3 for 75 EGP (Classic or M&M)
+          if (item.isEligibleForBundleOffer) {
+            eligibleBundleCount += qty;
+          }
+        }
+      });
+
+      // OFFER 1: "Buy 3 Classic or M&M Cookies for 75 EGP"
+      // Regular price for 3 @ 30 EGP = 90 EGP. Discount is 15 EGP per group of 3.
+      const bundleSets = Math.floor(eligibleBundleCount / 3);
+      const bundleDiscount = bundleSets * 15;
+
+      // OFFER 2: "Buy 5 cookies or more and get a FREE Classic Cookie"
+      const freeCookieEarned = totalCookiesCount >= 5;
+
+      const finalTotal = Math.max(0, subtotal - bundleDiscount);
+
+      return {
+        subtotal,
+        bundleDiscount,
+        bundleSets,
+        totalCookiesCount,
+        freeCookieEarned,
+        finalTotal
+      };
+    }
+
+    /* ================================================================
+       UPDATE CART UI
+       ================================================================ */
+    function updateCartUI() {
+      const itemsContainer = document.getElementById("cart-items-container");
+      const badge = document.getElementById("cart-badge");
+      const subtotalEl = document.getElementById("cart-subtotal");
+      const totalEl = document.getElementById("cart-total");
+      const modalTotalEl = document.getElementById("modal-order-total");
+      const discountRow = document.getElementById("discount-row");
+      const discountEl = document.getElementById("cart-discount");
+      const offersAppliedBox = document.getElementById("offers-applied-box");
+      const checkoutBtn = document.getElementById("checkout-btn");
+
+      const totals = calculateCartTotals();
+
+      // Update badge
+      badge.textContent = totals.totalCookiesCount;
+
+      // If cart empty
+      if (totals.totalCookiesCount === 0) {
+        itemsContainer.innerHTML = `
+          <div class="h-64 flex flex-col items-center justify-center text-center text-stone-400">
+            <svg class="w-16 h-16 text-amber-300/80 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+            </svg>
+            <p class="font-medium text-stone-600">Your cookie cart is empty</p>
+            <p class="text-xs text-stone-400 mt-1">Add some sweet treats from our menu!</p>
+          </div>
+        `;
+        checkoutBtn.disabled = true;
+        offersAppliedBox.innerHTML = "";
+        discountRow.classList.add("hidden");
+        subtotalEl.textContent = `0 ${STORE_CONFIG.currency}`;
+        totalEl.textContent = `0 ${STORE_CONFIG.currency}`;
+        modalTotalEl.textContent = `0 ${STORE_CONFIG.currency}`;
+        return;
+      }
+
+      checkoutBtn.disabled = false;
+
+      // Render items
+      itemsContainer.innerHTML = "";
+      Object.keys(cart).forEach(id => {
+        const item = PRODUCTS.find(p => p.id === id);
+        const qty = cart[id];
+        if (!item || qty <= 0) return;
+
+        const row = document.createElement("div");
+        row.className = "flex items-center gap-3 bg-white p-3 rounded-2xl border border-amber-200/80 shadow-sm";
+        row.innerHTML = `
+          <img 
+            src="${item.image}" 
+            alt="${item.name}" 
+            class="w-16 h-16 rounded-xl object-cover bg-amber-50"
+            onerror="this.src='https://placehold.co/100x100/F5E6D3/582B0E?text=Cookie';"
+          />
+          <div class="flex-1 min-w-0">
+            <h4 class="font-bold text-[#582B0E] text-sm truncate">${item.name}</h4>
+            <p class="text-xs text-[#8A4815]">${item.price} ${STORE_CONFIG.currency} each</p>
+            <p class="text-xs font-bold text-[#582B0E] mt-0.5">${item.price * qty} ${STORE_CONFIG.currency}</p>
+          </div>
+          <div class="flex items-center gap-1.5 bg-[#F8F2E9] rounded-xl p-1 border border-amber-200">
+            <button 
+              onclick="changeQuantity('${item.id}', -1)"
+              class="w-6 h-6 rounded-lg bg-white text-[#582B0E] font-bold text-xs flex items-center justify-center hover:bg-amber-100 transition shadow-xs"
+              aria-label="Decrease quantity"
+            >-</button>
+            <span class="w-6 text-center text-xs font-bold text-[#582B0E]">${qty}</span>
+            <button 
+              onclick="changeQuantity('${item.id}', 1)"
+              class="w-6 h-6 rounded-lg bg-white text-[#582B0E] font-bold text-xs flex items-center justify-center hover:bg-amber-100 transition shadow-xs"
+              aria-label="Increase quantity"
+            >+</button>
+          </div>
+        `;
+        itemsContainer.appendChild(row);
+      });
+
+      // Special Offers Notices
+      offersAppliedBox.innerHTML = "";
+
+      if (totals.bundleSets > 0) {
+        offersAppliedBox.innerHTML += `
+          <div class="bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs p-2.5 rounded-xl flex items-center justify-between">
+            <span class="flex items-center gap-1.5 font-semibold">
+              <span>🎉</span> Bundle Deal Applied (${totals.bundleSets}x 3-Cookie Pack)
+            </span>
+            <span class="font-bold">-${totals.bundleDiscount} ${STORE_CONFIG.currency}</span>
+          </div>
+        `;
+      }
+
+      if (totals.freeCookieEarned) {
+        offersAppliedBox.innerHTML += `
+          <div class="bg-amber-100/80 border border-amber-300 text-amber-900 text-xs p-2.5 rounded-xl flex items-center justify-between font-semibold">
+            <span class="flex items-center gap-1.5">
+              <span>🎁</span> 5+ Cookies Promo:
+            </span>
+            <span class="bg-white px-2 py-0.5 rounded text-[11px] font-bold text-amber-900 border border-amber-300">
+              +1 FREE Classic Cookie
+            </span>
+          </div>
+        `;
+      } else {
+        const remainingForFree = 5 - totals.totalCookiesCount;
+        offersAppliedBox.innerHTML += `
+          <p class="text-[11px] text-amber-800/80 text-center italic">
+            Add ${remainingForFree} more cookie${remainingForFree > 1 ? 's' : ''} to get a FREE Classic Cookie!
+          </p>
+        `;
+      }
+
+      // Discount row display
+      if (totals.bundleDiscount > 0) {
+        discountRow.classList.remove("hidden");
+        discountEl.textContent = `-${totals.bundleDiscount} ${STORE_CONFIG.currency}`;
+      } else {
+        discountRow.classList.add("hidden");
+      }
+
+      // Update text
+      subtotalEl.textContent = `${totals.subtotal} ${STORE_CONFIG.currency}`;
+      totalEl.textContent = `${totals.finalTotal} ${STORE_CONFIG.currency}`;
+      modalTotalEl.textContent = `${totals.finalTotal} ${STORE_CONFIG.currency}`;
+    }
+
+    /* ================================================================
+       DRAWER & MODAL CONTROLS
+       ================================================================ */
+    function toggleCart(open) {
+      const drawer = document.getElementById("cart-drawer");
+      const backdrop = document.getElementById("cart-drawer-backdrop");
+
+      if (open) {
+        backdrop.classList.remove("opacity-0", "pointer-events-none");
+        backdrop.classList.add("opacity-100");
+        drawer.classList.remove("translate-x-full");
+      } else {
+        backdrop.classList.add("opacity-0", "pointer-events-none");
+        backdrop.classList.remove("opacity-100");
+        drawer.classList.add("translate-x-full");
+      }
+    }
+
+    function openCheckoutModal() {
+      toggleCart(false);
+      document.getElementById("checkout-modal").classList.remove("hidden");
+    }
+
+    function closeCheckoutModal() {
+      document.getElementById("checkout-modal").classList.add("hidden");
+    }
+
+    function closeSuccessModal() {
+      document.getElementById("success-modal").classList.add("hidden");
+    }
+
+    /* ================================================================
+       ORDER SUBMISSION (DIRECT & WHATSAPP)
+       ================================================================ */
+    function getOrderTextSummary(name, phone, address, notes) {
+      const totals = calculateCartTotals();
+      let text = `*New Cookie Order - ${STORE_CONFIG.storeName}*\n\n`;
+      text += `*Customer:* ${name}\n`;
+      text += `*Phone:* ${phone}\n`;
+      text += `*Address:* ${address}\n`;
+      if (notes) text += `*Notes:* ${notes}\n`;
+      text += `\n*Order Items:*\n`;
+
+      Object.keys(cart).forEach(id => {
+        const item = PRODUCTS.find(p => p.id === id);
+        const qty = cart[id];
+        if (item && qty > 0) {
+          text += `• ${item.name} x ${qty} = ${item.price * qty} ${STORE_CONFIG.currency}\n`;
+        }
+      });
+
+      if (totals.bundleDiscount > 0) {
+        text += `\n*Special Offer Discount:* -${totals.bundleDiscount} ${STORE_CONFIG.currency}\n`;
+      }
+      if (totals.freeCookieEarned) {
+        text += `*Bonus Reward:* 1x FREE Classic Cookie\n`;
+      }
+
+      text += `\n*Total Amount:* ${totals.finalTotal} ${STORE_CONFIG.currency}`;
+      return text;
+    }
+
+    function handlePlaceOrder(e) {
+      e.preventDefault();
+      const name = document.getElementById("cust-name").value.trim();
+      const phone = document.getElementById("cust-phone").value.trim();
+      const address = document.getElementById("cust-address").value.trim();
+      const notes = document.getElementById("cust-notes").value.trim();
+
+      const totals = calculateCartTotals();
+
+      // Show summary inside success modal
+      const summaryBox = document.getElementById("order-summary-box");
+      summaryBox.innerHTML = `
+        <p><strong>Name:</strong> ${name}</p>
+        <p><strong>Phone:</strong> ${phone}</p>
+        <p><strong>Delivery:</strong> ${address}</p>
+        <p><strong>Total Due:</strong> ${totals.finalTotal} ${STORE_CONFIG.currency}</p>
+        ${totals.freeCookieEarned ? '<p class="text-amber-700 font-semibold mt-1">🎁 Includes 1 Free Classic Cookie!</p>' : ''}
+      `;
+
+      closeCheckoutModal();
+      document.getElementById("success-modal").classList.remove("hidden");
+
+      // Reset cart and form
+      cart = {};
+      document.getElementById("order-form").reset();
+      updateCartUI();
+    }
+
+    function submitOrderViaWhatsApp() {
+      const name = document.getElementById("cust-name").value.trim();
+      const phone = document.getElementById("cust-phone").value.trim();
+      const address = document.getElementById("cust-address").value.trim();
+      const notes = document.getElementById("cust-notes").value.trim();
+
+      if (!name || !phone || !address) {
+        showToast("⚠️ Please enter your Name, Phone, and Address first!");
+        return;
+      }
+
+      const msg = getOrderTextSummary(name, phone, address, notes);
+      const encodedMsg = encodeURIComponent(msg);
+      const url = `https://wa.me/${STORE_CONFIG.whatsappNumber}?text=${encodedMsg}`;
+      
+      window.open(url, '_blank');
+      
+      // Complete order locally
+      handlePlaceOrder(new Event("submit"));
+    }
+
+    /* ================================================================
+       TOAST HELPER
+       ================================================================ */
+    let toastTimeout;
+    function showToast(message) {
+      const toast = document.getElementById("toast");
+      toast.querySelector("span").textContent = message;
+      toast.classList.remove("opacity-0", "pointer-events-none");
+      toast.classList.add("opacity-100");
+
+      clearTimeout(toastTimeout);
+      toastTimeout = setTimeout(() => {
+        toast.classList.remove("opacity-100");
+        toast.classList.add("opacity-0", "pointer-events-none");
+      }, 2000);
+    }
+  </script>
+</body>
+</html>
