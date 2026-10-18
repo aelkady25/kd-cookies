@@ -124,17 +124,17 @@
         <div class="flex items-center justify-center gap-2">
           <span class="text-xl">✨</span>
           <p class="text-base sm:text-lg font-bold">
-            Buy 3 Classic or M&amp;M Cookies for <span class="text-[#D8974B] underline decoration-2">75 EGP</span>
-            <span class="text-xs bg-amber-100 text-amber-900 font-semibold px-2 py-0.5 rounded ml-1">Save 15 EGP</span>
+            Buy 3 Classic or M&amp;M Cookies for <span class="text-[#D8974B] underline decoration-2">80 EGP</span>
+            <span class="text-xs bg-amber-100 text-amber-900 font-semibold px-2 py-0.5 rounded ml-1">Save 10 EGP</span>
           </p>
         </div>
 
         <div class="w-24 h-[1px] bg-amber-200 mx-auto"></div>
 
         <div class="flex items-center justify-center gap-2">
-          <span class="text-xl">🍪</span>
+          <span class="text-xl">🍫</span>
           <p class="text-base sm:text-lg font-bold">
-            Buy 5 cookies or more and get a <span class="text-[#D8974B]">FREE Classic Cookie</span>!
+            Buy 5 cookies or more and get a <span class="text-[#D8974B]">FREE Brownie</span>!
           </p>
         </div>
         
@@ -379,7 +379,7 @@
         price: 30,
         description: "Soft & chewy golden cookie loaded with semi-sweet chocolate chunks.",
         image: "IMG_4091.png",
-        isEligibleForBundleOffer: true // eligible for the 3 for 75 EGP deal
+        isEligibleForBundleOffer: true // eligible for the 3 for 80 EGP deal
       },
       {
         id: "peanut_butter",
@@ -403,7 +403,7 @@
         price: 30,
         description: "Fudgy chocolatey goodness.",
         image: "b.png",
-        isEligibleForBundleOffer: true // eligible for the 3 for 75 EGP deal
+        isEligibleForBundleOffer: true // eligible for the 3 for 80 EGP deal
       }
     ];
 
@@ -505,7 +505,7 @@
       updateCartUI();
     }
 
-    // Calculates raw subtotal and applies ONLY ONE offer at a time
+    // Calculates raw subtotal and switches between discount and free brownie based on quantity
     function calculateCartTotals() {
       let subtotal = 0;
       let totalCookiesCount = 0;
@@ -519,25 +519,27 @@
           subtotal += item.price * qty;
           totalCookiesCount += qty;
 
-          // Check if item qualifies for 3 for 75 EGP (Classic or M&M)
+          // Check if item qualifies for 3 for 80 EGP (Classic or Brownie)
           if (item.isEligibleForBundleOffer) {
             eligibleBundleCount += qty;
           }
         }
       });
 
-      // OFFER 1: "Buy 3 Classic or M&M Cookies for 75 EGP"
-      // Regular price for 3 @ 30 EGP = 90 EGP. Discount is 15 EGP per group of 3.
-      const bundleSets = Math.floor(eligibleBundleCount / 3);
       let bundleDiscount = 0;
-      let freeCookieEarned = false;
+      let bundleSets = 0;
+      let freeItemEarned = false;
 
-      // Enforce exclusivity: only one offer applied at a time
-      if (bundleSets > 0) {
-        bundleDiscount = bundleSets * 15;
-      } else if (totalCookiesCount >= 5) {
-        // OFFER 2: "Buy 5 cookies or more and get a FREE Classic Cookie"
-        freeCookieEarned = true;
+      // If 5 or more cookies/items bought: switches entirely to Free Brownie
+      if (totalCookiesCount >= 5) {
+        freeItemEarned = true;
+      } else {
+        // Under 5 items: qualify for the 3 for 80 EGP bundle discount
+        const sets = Math.floor(eligibleBundleCount / 3);
+        if (sets > 0) {
+          bundleSets = sets;
+          bundleDiscount = sets * 10;
+        }
       }
 
       const finalTotal = Math.max(0, subtotal - bundleDiscount);
@@ -545,9 +547,9 @@
       return {
         subtotal,
         bundleDiscount,
-        bundleSets: bundleDiscount > 0 ? bundleSets : 0,
+        bundleSets,
         totalCookiesCount,
-        freeCookieEarned,
+        freeItemEarned,
         finalTotal
       };
     }
@@ -630,10 +632,21 @@
         itemsContainer.appendChild(row);
       });
 
-      // Special Offers Notices (Exclusive)
+      // Special Offers Notices
       offersAppliedBox.innerHTML = "";
 
-      if (totals.bundleSets > 0) {
+      if (totals.freeItemEarned) {
+        offersAppliedBox.innerHTML += `
+          <div class="bg-amber-100/80 border border-amber-300 text-amber-900 text-xs p-2.5 rounded-xl flex items-center justify-between font-semibold">
+            <span class="flex items-center gap-1.5">
+              <span>🎁</span> 5+ Cookies Promo:
+            </span>
+            <span class="bg-white px-2 py-0.5 rounded text-[11px] font-bold text-amber-900 border border-amber-300">
+              +1 FREE Brownie
+            </span>
+          </div>
+        `;
+      } else if (totals.bundleSets > 0) {
         offersAppliedBox.innerHTML += `
           <div class="bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs p-2.5 rounded-xl flex items-center justify-between">
             <span class="flex items-center gap-1.5 font-semibold">
@@ -642,22 +655,17 @@
             <span class="font-bold">-${totals.bundleDiscount} ${STORE_CONFIG.currency}</span>
           </div>
         `;
-      } else if (totals.freeCookieEarned) {
+        const remainingForFree = 5 - totals.totalCookiesCount;
         offersAppliedBox.innerHTML += `
-          <div class="bg-amber-100/80 border border-amber-300 text-amber-900 text-xs p-2.5 rounded-xl flex items-center justify-between font-semibold">
-            <span class="flex items-center gap-1.5">
-              <span>🎁</span> 5+ Cookies Promo:
-            </span>
-            <span class="bg-white px-2 py-0.5 rounded text-[11px] font-bold text-amber-900 border border-amber-300">
-              +1 FREE Classic Cookie
-            </span>
-          </div>
+          <p class="text-[11px] text-amber-800/80 text-center italic">
+            Add ${remainingForFree} more cookie${remainingForFree > 1 ? 's' : ''} to switch to a FREE Brownie!
+          </p>
         `;
       } else {
         const remainingForFree = 5 - totals.totalCookiesCount;
         offersAppliedBox.innerHTML += `
           <p class="text-[11px] text-amber-800/80 text-center italic">
-            Add ${remainingForFree} more cookie${remainingForFree > 1 ? 's' : ''} to get a FREE Classic Cookie!
+            Add ${remainingForFree} more cookie${remainingForFree > 1 ? 's' : ''} to get a FREE Brownie!
           </p>
         `;
       }
@@ -727,10 +735,10 @@
         }
       });
 
-      if (totals.bundleDiscount > 0) {
+      if (totals.freeItemEarned) {
+        text += `*Bonus Reward:* 1x FREE Brownie\n`;
+      } else if (totals.bundleDiscount > 0) {
         text += `\n*Special Offer Discount:* -${totals.bundleDiscount} ${STORE_CONFIG.currency}\n`;
-      } else if (totals.freeCookieEarned) {
-        text += `*Bonus Reward:* 1x FREE Classic Cookie\n`;
       }
 
       text += `\n*Total Amount:* ${totals.finalTotal} ${STORE_CONFIG.currency}`;
@@ -753,7 +761,7 @@
         <p><strong>Phone:</strong> ${phone}</p>
         <p><strong>Delivery:</strong> ${address}</p>
         <p><strong>Total Due:</strong> ${totals.finalTotal} ${STORE_CONFIG.currency}</p>
-        ${totals.freeCookieEarned ? '<p class="text-amber-700 font-semibold mt-1">🎁 Includes 1 Free Classic Cookie!</p>' : ''}
+        ${totals.freeItemEarned ? '<p class="text-amber-700 font-semibold mt-1">🎁 Includes 1 Free Brownie!</p>' : ''}
       `;
 
       closeCheckoutModal();
