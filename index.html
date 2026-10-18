@@ -545,4 +545,263 @@
       return {
         subtotal,
         bundleDiscount,
-        bundleSets: bundleDiscount > 0 ? bundleSets :
+        bundleSets: bundleDiscount > 0 ? bundleSets : 0,
+        totalCookiesCount,
+        freeCookieEarned,
+        finalTotal
+      };
+    }
+
+    /* ================================================================
+       UPDATE CART UI
+       ================================================================ */
+    function updateCartUI() {
+      const itemsContainer = document.getElementById("cart-items-container");
+      const badge = document.getElementById("cart-badge");
+      const subtotalEl = document.getElementById("cart-subtotal");
+      const totalEl = document.getElementById("cart-total");
+      const modalTotalEl = document.getElementById("modal-order-total");
+      const discountRow = document.getElementById("discount-row");
+      const discountEl = document.getElementById("cart-discount");
+      const offersAppliedBox = document.getElementById("offers-applied-box");
+      const checkoutBtn = document.getElementById("checkout-btn");
+
+      const totals = calculateCartTotals();
+
+      // Update badge
+      badge.textContent = totals.totalCookiesCount;
+
+      // If cart empty
+      if (totals.totalCookiesCount === 0) {
+        itemsContainer.innerHTML = `
+          <div class="h-64 flex flex-col items-center justify-center text-center text-stone-400">
+            <svg class="w-16 h-16 text-amber-300/80 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+            </svg>
+            <p class="font-medium text-stone-600">Your cookie cart is empty</p>
+          </div>
+        `;
+        checkoutBtn.disabled = true;
+        offersAppliedBox.innerHTML = "";
+        discountRow.classList.add("hidden");
+        subtotalEl.textContent = `0 ${STORE_CONFIG.currency}`;
+        totalEl.textContent = `0 ${STORE_CONFIG.currency}`;
+        modalTotalEl.textContent = `0 ${STORE_CONFIG.currency}`;
+        return;
+      }
+
+      checkoutBtn.disabled = false;
+
+      // Render items
+      itemsContainer.innerHTML = "";
+      Object.keys(cart).forEach(id => {
+        const item = PRODUCTS.find(p => p.id === id);
+        const qty = cart[id];
+        if (!item || qty <= 0) return;
+
+        const row = document.createElement("div");
+        row.className = "flex items-center gap-3 bg-white p-3 rounded-2xl border border-amber-200/80 shadow-sm";
+        row.innerHTML = `
+          <img 
+            src="${item.image}" 
+            alt="${item.name}" 
+            class="w-16 h-16 rounded-xl object-cover bg-amber-50" 
+            onerror="this.src='https://placehold.co/100x100/F5E6D3/582B0E?text=Cookie';"
+          />
+          <div class="flex-1 min-w-0">
+            <h4 class="font-bold text-[#582B0E] text-sm truncate">${item.name}</h4>
+            <p class="text-xs text-[#8A4815]">${item.price} ${STORE_CONFIG.currency} each</p>
+            <p class="text-xs font-bold text-[#582B0E] mt-0.5">${item.price * qty} ${STORE_CONFIG.currency}</p>
+          </div>
+          <div class="flex items-center gap-1.5 bg-[#F8F2E9] rounded-xl p-1 border border-amber-200">
+            <button 
+              onclick="changeQuantity('${item.id}', -1)" 
+              class="w-6 h-6 rounded-lg bg-white text-[#582B0E] font-bold text-xs flex items-center justify-center hover:bg-amber-100 transition shadow-xs" 
+              aria-label="Decrease quantity"
+            >-</button>
+            <span class="w-6 text-center text-xs font-bold text-[#582B0E]">${qty}</span>
+            <button 
+              onclick="changeQuantity('${item.id}', 1)" 
+              class="w-6 h-6 rounded-lg bg-white text-[#582B0E] font-bold text-xs flex items-center justify-center hover:bg-amber-100 transition shadow-xs" 
+              aria-label="Increase quantity"
+            >+</button>
+          </div>
+        `;
+        itemsContainer.appendChild(row);
+      });
+
+      // Special Offers Notices (Exclusive)
+      offersAppliedBox.innerHTML = "";
+
+      if (totals.bundleSets > 0) {
+        offersAppliedBox.innerHTML += `
+          <div class="bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs p-2.5 rounded-xl flex items-center justify-between">
+            <span class="flex items-center gap-1.5 font-semibold">
+              <span>🎉</span> Bundle Deal Applied (${totals.bundleSets}x 3-Cookie Pack)
+            </span>
+            <span class="font-bold">-${totals.bundleDiscount} ${STORE_CONFIG.currency}</span>
+          </div>
+        `;
+      } else if (totals.freeCookieEarned) {
+        offersAppliedBox.innerHTML += `
+          <div class="bg-amber-100/80 border border-amber-300 text-amber-900 text-xs p-2.5 rounded-xl flex items-center justify-between font-semibold">
+            <span class="flex items-center gap-1.5">
+              <span>🎁</span> 5+ Cookies Promo:
+            </span>
+            <span class="bg-white px-2 py-0.5 rounded text-[11px] font-bold text-amber-900 border border-amber-300">
+              +1 FREE Classic Cookie
+            </span>
+          </div>
+        `;
+      } else {
+        const remainingForFree = 5 - totals.totalCookiesCount;
+        offersAppliedBox.innerHTML += `
+          <p class="text-[11px] text-amber-800/80 text-center italic">
+            Add ${remainingForFree} more cookie${remainingForFree > 1 ? 's' : ''} to get a FREE Classic Cookie!
+          </p>
+        `;
+      }
+
+      // Discount row display
+      if (totals.bundleDiscount > 0) {
+        discountRow.classList.remove("hidden");
+        discountEl.textContent = `-${totals.bundleDiscount} ${STORE_CONFIG.currency}`;
+      } else {
+        discountRow.classList.add("hidden");
+      }
+
+      // Update text
+      subtotalEl.textContent = `${totals.subtotal} ${STORE_CONFIG.currency}`;
+      totalEl.textContent = `${totals.finalTotal} ${STORE_CONFIG.currency}`;
+      modalTotalEl.textContent = `${totals.finalTotal} ${STORE_CONFIG.currency}`;
+    }
+
+    /* ================================================================
+       DRAWER & MODAL CONTROLS
+       ================================================================ */
+    function toggleCart(open) {
+      const drawer = document.getElementById("cart-drawer");
+      const backdrop = document.getElementById("cart-drawer-backdrop");
+
+      if (open) {
+        backdrop.classList.remove("opacity-0", "pointer-events-none");
+        backdrop.classList.add("opacity-100");
+        drawer.classList.remove("translate-x-full");
+      } else {
+        backdrop.classList.add("opacity-0", "pointer-events-none");
+        backdrop.classList.remove("opacity-100");
+        drawer.classList.add("translate-x-full");
+      }
+    }
+
+    function openCheckoutModal() {
+      toggleCart(false);
+      document.getElementById("checkout-modal").classList.remove("hidden");
+    }
+
+    function closeCheckoutModal() {
+      document.getElementById("checkout-modal").classList.add("hidden");
+    }
+
+    function closeSuccessModal() {
+      document.getElementById("success-modal").classList.add("hidden");
+    }
+
+    /* ================================================================
+       ORDER SUBMISSION (DIRECT & WHATSAPP)
+       ================================================================ */
+    function getOrderTextSummary(name, phone, address, notes) {
+      const totals = calculateCartTotals();
+      let text = `*New Cookie Order - ${STORE_CONFIG.storeName}*\n\n`;
+      text += `*Customer:* ${name}\n`;
+      text += `*Phone:* ${phone}\n`;
+      text += `*Address:* ${address}\n`;
+      if (notes) text += `*Notes:* ${notes}\n`;
+      text += `\n*Order Items:*\n`;
+
+      Object.keys(cart).forEach(id => {
+        const item = PRODUCTS.find(p => p.id === id);
+        const qty = cart[id];
+        if (item && qty > 0) {
+          text += `• ${item.name} x ${qty} = ${item.price * qty} ${STORE_CONFIG.currency}\n`;
+        }
+      });
+
+      if (totals.bundleDiscount > 0) {
+        text += `\n*Special Offer Discount:* -${totals.bundleDiscount} ${STORE_CONFIG.currency}\n`;
+      } else if (totals.freeCookieEarned) {
+        text += `*Bonus Reward:* 1x FREE Classic Cookie\n`;
+      }
+
+      text += `\n*Total Amount:* ${totals.finalTotal} ${STORE_CONFIG.currency}`;
+      return text;
+    }
+
+    function handlePlaceOrder(e) {
+      e.preventDefault();
+      const name = document.getElementById("cust-name").value.trim();
+      const phone = document.getElementById("cust-phone").value.trim();
+      const address = document.getElementById("cust-address").value.trim();
+      const notes = document.getElementById("cust-notes").value.trim();
+
+      const totals = calculateCartTotals();
+
+      // Show summary inside success modal
+      const summaryBox = document.getElementById("order-summary-box");
+      summaryBox.innerHTML = `
+        <p><strong>Name:</strong> ${name}</p>
+        <p><strong>Phone:</strong> ${phone}</p>
+        <p><strong>Delivery:</strong> ${address}</p>
+        <p><strong>Total Due:</strong> ${totals.finalTotal} ${STORE_CONFIG.currency}</p>
+        ${totals.freeCookieEarned ? '<p class="text-amber-700 font-semibold mt-1">🎁 Includes 1 Free Classic Cookie!</p>' : ''}
+      `;
+
+      closeCheckoutModal();
+      document.getElementById("success-modal").classList.remove("hidden");
+
+      // Reset cart and form
+      cart = {};
+      document.getElementById("order-form").reset();
+      updateCartUI();
+    }
+
+    function submitOrderViaWhatsApp() {
+      const name = document.getElementById("cust-name").value.trim();
+      const phone = document.getElementById("cust-phone").value.trim();
+      const address = document.getElementById("cust-address").value.trim();
+      const notes = document.getElementById("cust-notes").value.trim();
+
+      if (!name || !phone || !address) {
+        showToast("⚠️ Please enter your Name, Phone, and Address first!");
+        return;
+      }
+
+      const msg = getOrderTextSummary(name, phone, address, notes);
+      const encodedMsg = encodeURIComponent(msg);
+      const url = `https://wa.me/${STORE_CONFIG.whatsappNumber}?text=${encodedMsg}`;
+      
+      window.open(url, '_blank');
+      
+      // Complete order locally
+      handlePlaceOrder(new Event("submit"));
+    }
+
+    /* ================================================================
+       TOAST HELPER
+       ================================================================ */
+    let toastTimeout;
+    function showToast(message) {
+      const toast = document.getElementById("toast");
+      toast.querySelector("span").textContent = message;
+      toast.classList.remove("opacity-0", "pointer-events-none");
+      toast.classList.add("opacity-100");
+
+      clearTimeout(toastTimeout);
+      toastTimeout = setTimeout(() => {
+        toast.classList.remove("opacity-100");
+        toast.classList.add("opacity-0", "pointer-events-none");
+      }, 2000);
+    }
+  </script>
+</body>
+</html>
