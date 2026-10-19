@@ -54,6 +54,20 @@
 <body class="min-h-screen flex flex-col selection:bg-amber-200">
 
   <!-- ========================================== -->
+  <!-- ADJUSTABLE RED TOP BANNER: SOLD OUT TODAY  -->
+  <!-- (Set STORE_CONFIG.isSoldOutForToday in JS) -->
+  <!-- ========================================== -->
+  <div 
+    id="top-sold-out-banner" 
+    class="bg-red-600 text-white font-sans text-xs sm:text-sm font-extrabold uppercase tracking-widest text-center py-2.5 px-4 shadow-md flex items-center justify-center gap-2"
+  >
+    <svg class="w-4 h-4 text-white shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+    </svg>
+    <span id="top-banner-text">Sold Out for the Day - Orders are closed today!</span>
+  </div>
+
+  <!-- ========================================== -->
   <!-- HEADER & NAVIGATION                        -->
   <!-- ========================================== -->
   <header class="sticky top-0 z-40 bg-[#FDFBF7]/95 backdrop-blur-md border-b border-amber-200/60 shadow-sm">
@@ -325,12 +339,13 @@
     class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden flex items-center justify-center p-4"
   >
     <div class="bg-[#FEFCE8] rounded-3xl max-w-md w-full p-8 text-center border-2 border-[#D8974B] shadow-2xl space-y-4 animate-scaleUp">
-      <div class="w-16 h-16 bg-amber-100 rounded-full mx-auto flex items-center justify-center p-2.5 shadow border border-amber-200">
+      <!-- Enlarged image container above Thank You (w-28 h-28) -->
+      <div class="w-28 h-28 bg-amber-100 rounded-full mx-auto flex items-center justify-center p-3 shadow-md border-2 border-amber-300">
         <img 
           src="logo.png" 
           alt="Order Success Icon" 
-          class="w-full h-full object-contain"
-          onerror="this.onerror=null; this.src='https://placehold.co/64x64/F5E6D3/582B0E?text=🍪';"
+          class="w-full h-full object-contain" 
+          onerror="this.onerror=null; this.src='https://placehold.co/112x112/F5E6D3/582B0E?text=🍪';"
         />
       </div>
       <h3 class="font-serif text-3xl font-bold text-[#582B0E]">Thank You!</h3>
@@ -363,19 +378,20 @@
   <script>
     /* ================================================================
        EASY EDIT CONFIGURATION SECTION
-       👉 Edit your cookie items, prices, photos, store phone, and soldOut status here!
+       👉 Edit items, toggle sold out for today banner, prices, and status here!
        ================================================================ */
     const STORE_CONFIG = {
       storeName: "KD Cookies",
       currency: "EGP",
-      // Set your WhatsApp phone number with country code (e.g., 20 for Egypt + number)
       whatsappNumber: "201005858086",
-      // 👉 Set your logo image URL or local path here (e.g. 'images/logo.png')
-      logoUrl: "logo.png"
+      logoUrl: "logo.png",
+      
+      // 👉 TOGGLE TOP BANNER: change to true/false to show/hide the red top banner
+      isSoldOutForToday: true,
+      soldOutBannerText: "Sold Out for the Day - Orders are closed today!"
     };
 
     // Products matching your menu
-    // NOTE: Change soldOut to true when an item runs out of stock!
     const PRODUCTS = [
       {
         id: "classic",
@@ -383,7 +399,7 @@
         price: 30,
         description: "Soft & chewy golden cookie loaded with semi-sweet chocolate chunks.",
         image: "IMG_4091.png",
-        isEligibleForBundleOffer: true, // eligible for the 3 for 80 EGP deal
+        isEligibleForBundleOffer: true,
         soldOut: false
       },
       {
@@ -418,12 +434,23 @@
     /* ================================================================
        APPLICATION STATE
        ================================================================ */
-    let cart = {}; // maps productId -> quantity
+    let cart = {};
 
-    // Initial load
     document.addEventListener("DOMContentLoaded", () => {
       document.getElementById("year").textContent = new Date().getFullYear();
       
+      // Control top red banner visibility & text
+      const bannerEl = document.getElementById("top-sold-out-banner");
+      const bannerTextEl = document.getElementById("top-banner-text");
+      if (bannerEl) {
+        if (STORE_CONFIG.isSoldOutForToday) {
+          bannerEl.classList.remove("hidden");
+          if (bannerTextEl) bannerTextEl.textContent = STORE_CONFIG.soldOutBannerText;
+        } else {
+          bannerEl.classList.add("hidden");
+        }
+      }
+
       // Update logo image from config
       const logoEl = document.getElementById("brand-logo");
       if (logoEl && STORE_CONFIG.logoUrl) {
@@ -459,9 +486,10 @@
               />
               ${isSoldOut ? `
                 <div class="absolute inset-0 bg-black/40 backdrop-blur-[1px] flex items-center justify-center">
-                  <span class="bg-[#582B0E]/90 text-white font-serif italic font-bold text-lg sm:text-xl px-5 py-2 rounded-full border border-amber-300 shadow-xl tracking-wide">
-  Sold Out
-</span>
+                  <!-- Updated Font: Sans-serif bold uppercase badge -->
+                  <span class="bg-[#582B0E]/95 text-white font-sans uppercase font-extrabold text-sm sm:text-base px-5 py-2.5 rounded-full border border-amber-300 shadow-xl tracking-widest">
+                    Sold Out
+                  </span>
                 </div>
               ` : ''}
             </div>
@@ -536,13 +564,11 @@
       updateCartUI();
     }
 
-    // Calculates raw subtotal and switches between discount and free brownie based on quantity
     function calculateCartTotals() {
       let subtotal = 0;
       let totalCookiesCount = 0;
       let eligibleBundleCount = 0;
 
-      // Scan through all items in cart
       Object.keys(cart).forEach(id => {
         const item = PRODUCTS.find(p => p.id === id);
         const qty = cart[id];
@@ -550,7 +576,6 @@
           subtotal += item.price * qty;
           totalCookiesCount += qty;
 
-          // Check if item qualifies for 3 for 80 EGP (Classic or Peanut Butter)
           if (item.isEligibleForBundleOffer) {
             eligibleBundleCount += qty;
           }
@@ -561,11 +586,9 @@
       let bundleSets = 0;
       let freeItemEarned = false;
 
-      // If 5 or more cookies/items bought: switches entirely to Free Brownie
       if (totalCookiesCount >= 5) {
         freeItemEarned = true;
       } else {
-        // Under 5 items: qualify for the 3 for 80 EGP bundle discount
         const sets = Math.floor(eligibleBundleCount / 3);
         if (sets > 0) {
           bundleSets = sets;
@@ -601,10 +624,8 @@
 
       const totals = calculateCartTotals();
 
-      // Update badge
       badge.textContent = totals.totalCookiesCount;
 
-      // If cart empty
       if (totals.totalCookiesCount === 0) {
         itemsContainer.innerHTML = `
           <div class="h-64 flex flex-col items-center justify-center text-center text-stone-400">
@@ -625,7 +646,6 @@
 
       checkoutBtn.disabled = false;
 
-      // Render items
       itemsContainer.innerHTML = "";
       Object.keys(cart).forEach(id => {
         const item = PRODUCTS.find(p => p.id === id);
@@ -663,7 +683,6 @@
         itemsContainer.appendChild(row);
       });
 
-      // Special Offers Notices
       offersAppliedBox.innerHTML = "";
 
       if (totals.freeItemEarned) {
@@ -701,7 +720,6 @@
         `;
       }
 
-      // Discount row display
       if (totals.bundleDiscount > 0) {
         discountRow.classList.remove("hidden");
         discountEl.textContent = `-${totals.bundleDiscount} ${STORE_CONFIG.currency}`;
@@ -709,7 +727,6 @@
         discountRow.classList.add("hidden");
       }
 
-      // Update text
       subtotalEl.textContent = `${totals.subtotal} ${STORE_CONFIG.currency}`;
       totalEl.textContent = `${totals.finalTotal} ${STORE_CONFIG.currency}`;
       modalTotalEl.textContent = `${totals.finalTotal} ${STORE_CONFIG.currency}`;
@@ -747,7 +764,7 @@
     }
 
     /* ================================================================
-       ORDER SUBMISSION (DIRECT & WHATSAPP)
+       ORDER SUBMISSION
        ================================================================ */
     function getOrderTextSummary(name, phone, address, notes) {
       const totals = calculateCartTotals();
@@ -785,7 +802,6 @@
 
       const totals = calculateCartTotals();
 
-      // Show summary inside success modal
       const summaryBox = document.getElementById("order-summary-box");
       summaryBox.innerHTML = `
         <p><strong>Name:</strong> ${name}</p>
@@ -798,7 +814,6 @@
       closeCheckoutModal();
       document.getElementById("success-modal").classList.remove("hidden");
 
-      // Reset cart and form
       cart = {};
       document.getElementById("order-form").reset();
       updateCartUI();
@@ -820,8 +835,6 @@
       const url = `https://wa.me/${STORE_CONFIG.whatsappNumber}?text=${encodedMsg}`;
       
       window.open(url, '_blank');
-      
-      // Complete order locally
       handlePlaceOrder(new Event("submit"));
     }
 
