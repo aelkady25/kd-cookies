@@ -325,9 +325,14 @@
     class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden flex items-center justify-center p-4"
   >
     <div class="bg-[#FDFBF7] rounded-3xl max-w-md w-full p-8 text-center border-2 border-[#D8974B] shadow-2xl space-y-4 animate-scaleUp">
-      <div class="w-16 h-16 bg-amber-100 text-[#D8974B] rounded-full mx-auto flex items-center justify-center text-3xl shadow">
-        🍪
-      </div>
+      <div class="w-16 h-16 bg-amber-100 rounded-full mx-auto flex items-center justify-center p-2.5 shadow border border-amber-200">
+  <img 
+    src="cookie-icon.png" 
+    alt="Order Success Icon" 
+    class="w-full h-full object-contain"
+    onerror="this.onerror=null; this.src='https://placehold.co/64x64/F5E6D3/582B0E?text=🍪';"
+  />
+</div>
       <h3 class="font-serif text-3xl font-bold text-[#582B0E]">Thank You!</h3>
       <p class="text-sm text-[#8A4815] leading-relaxed">
         Your order has been placed successfully! We'll start baking your fresh cookies right away.
@@ -384,7 +389,7 @@
       {
         id: "peanut_butter",
         name: "Peanut Butter Cookie",
-        price: 30,
+        price: 35,
         description: "Rich, nutty, and tender peanut butter dough infused with decadent chocolate drops.",
         image: "pbc.png",
         isEligibleForBundleOffer: true
