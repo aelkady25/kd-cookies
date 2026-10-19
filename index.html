@@ -326,13 +326,13 @@
   >
     <div class="bg-[#FDFBF7] rounded-3xl max-w-md w-full p-8 text-center border-2 border-[#D8974B] shadow-2xl space-y-4 animate-scaleUp">
       <div class="w-16 h-16 bg-amber-100 rounded-full mx-auto flex items-center justify-center p-2.5 shadow border border-amber-200">
-  <img 
-    src="logo.png" 
-    alt="Order Success Icon" 
-    class="w-full h-full object-contain"
-    onerror="this.onerror=null; this.src='https://placehold.co/64x64/F5E6D3/582B0E?text=🍪';"
-  />
-</div>
+        <img 
+          src="cookie-icon.png" 
+          alt="Order Success Icon" 
+          class="w-full h-full object-contain"
+          onerror="this.onerror=null; this.src='https://placehold.co/64x64/F5E6D3/582B0E?text=🍪';"
+        />
+      </div>
       <h3 class="font-serif text-3xl font-bold text-[#582B0E]">Thank You!</h3>
       <p class="text-sm text-[#8A4815] leading-relaxed">
         Your order has been placed successfully! We'll start baking your fresh cookies right away.
@@ -363,7 +363,7 @@
   <script>
     /* ================================================================
        EASY EDIT CONFIGURATION SECTION
-       👉 Edit your cookie items, prices, photos, and store phone here!
+       👉 Edit your cookie items, prices, photos, store phone, and soldOut status here!
        ================================================================ */
     const STORE_CONFIG = {
       storeName: "KD Cookies",
@@ -375,8 +375,7 @@
     };
 
     // Products matching your menu
-    // NOTE: You can replace the 'image' URLs below with your own local file path 
-    // e.g. 'images/classic.jpg' or any image web link!
+    // NOTE: Change soldOut to true when an item runs out of stock!
     const PRODUCTS = [
       {
         id: "classic",
@@ -384,15 +383,17 @@
         price: 30,
         description: "Soft & chewy golden cookie loaded with semi-sweet chocolate chunks.",
         image: "IMG_4091.png",
-        isEligibleForBundleOffer: true // eligible for the 3 for 80 EGP deal
+        isEligibleForBundleOffer: true, // eligible for the 3 for 80 EGP deal
+        soldOut: false
       },
       {
         id: "peanut_butter",
         name: "Peanut Butter Cookie",
-        price: 35,
+        price: 30,
         description: "Rich, nutty, and tender peanut butter dough infused with decadent chocolate drops.",
         image: "pbc.png",
-        isEligibleForBundleOffer: true
+        isEligibleForBundleOffer: true,
+        soldOut: false
       },
       {
         id: "double_chunk",
@@ -400,15 +401,17 @@
         price: 35,
         description: "Intense double chocolate dough packed with melted chocolate chunks for serious chocoholics.",
         image: "dcc1.png",
-        isEligibleForBundleOffer: false
+        isEligibleForBundleOffer: false,
+        soldOut: false
       },
       {
         id: "brownie",
         name: "Brownie",
-        price: 30,
+        price: 35,
         description: "Fudgy chocolatey goodness.",
         image: "b.png",
-        isEligibleForBundleOffer: false // eligible for the 3 for 80 EGP deal
+        isEligibleForBundleOffer: false,
+        soldOut: false
       }
     ];
 
@@ -439,8 +442,9 @@
       container.innerHTML = "";
 
       PRODUCTS.forEach(product => {
+        const isSoldOut = Boolean(product.soldOut);
         const card = document.createElement("div");
-        card.className = "cookie-card-border rounded-[32px] overflow-hidden bg-[#FDFBF7] shadow-md hover:shadow-xl transition-all duration-300 flex flex-col";
+        card.className = `cookie-card-border rounded-[32px] overflow-hidden bg-[#FDFBF7] shadow-md hover:shadow-xl transition-all duration-300 flex flex-col ${isSoldOut ? 'opacity-90' : ''}`;
         
         card.innerHTML = `
           <!-- Image Wrapper with menu styled border inside -->
@@ -451,8 +455,15 @@
                 alt="${product.name}" 
                 loading="lazy" 
                 onerror="this.onerror=null; this.src='https://placehold.co/600x800/F5E6D3/582B0E?text=${encodeURIComponent(product.name)}';"
-                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
+                class="w-full h-full object-cover ${isSoldOut ? 'grayscale-[40%]' : 'group-hover:scale-105'} transition-transform duration-500" 
               />
+              ${isSoldOut ? `
+                <div class="absolute inset-0 bg-black/40 backdrop-blur-[1px] flex items-center justify-center">
+                  <span class="bg-[#582B0E]/90 text-white font-serif font-bold text-lg sm:text-xl uppercase px-5 py-2 rounded-full border border-amber-300 shadow-xl tracking-wider">
+                    Sold Out
+                  </span>
+                </div>
+              ` : ''}
             </div>
           </div>
 
@@ -467,15 +478,24 @@
             </div>
 
             <div class="mt-4 pt-3 border-t border-amber-300/40 flex items-center justify-center gap-3">
-              <button 
-                onclick="addToCart('${product.id}')" 
-                class="w-full bg-[#582B0E] hover:bg-[#442009] text-white py-2.5 px-4 rounded-xl font-bold text-sm tracking-wide shadow-md active:scale-95 transition flex items-center justify-center gap-2"
-              >
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-                </svg>
-                <span>Add to Cart</span>
-              </button>
+              ${isSoldOut ? `
+                <button 
+                  disabled
+                  class="w-full bg-[#582B0E]/50 text-amber-200/70 py-2.5 px-4 rounded-xl font-bold text-sm tracking-wide cursor-not-allowed flex items-center justify-center gap-2"
+                >
+                  <span>Out of Stock</span>
+                </button>
+              ` : `
+                <button 
+                  onclick="addToCart('${product.id}')" 
+                  class="w-full bg-[#582B0E] hover:bg-[#442009] text-white py-2.5 px-4 rounded-xl font-bold text-sm tracking-wide shadow-md active:scale-95 transition flex items-center justify-center gap-2"
+                >
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                  </svg>
+                  <span>Add to Cart</span>
+                </button>
+              `}
             </div>
           </div>
         `;
@@ -487,6 +507,12 @@
        CART ACTIONS & SPECIAL OFFERS LOGIC
        ================================================================ */
     function addToCart(productId) {
+      const item = PRODUCTS.find(p => p.id === productId);
+      if (item && item.soldOut) {
+        showToast("⚠️ Sorry, this item is sold out!");
+        return;
+      }
+
       if (!cart[productId]) {
         cart[productId] = 0;
       }
@@ -524,7 +550,7 @@
           subtotal += item.price * qty;
           totalCookiesCount += qty;
 
-          // Check if item qualifies for 3 for 80 EGP (Classic or Brownie)
+          // Check if item qualifies for 3 for 80 EGP (Classic or Peanut Butter)
           if (item.isEligibleForBundleOffer) {
             eligibleBundleCount += qty;
           }
